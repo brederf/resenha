@@ -20,7 +20,7 @@ A versão pessoal continua no ar enquanto a nova não fica pronta:
 - Cobrança: decidir depois. Sugestão registrada: amigos de graça, cobrar só de quem chega de fora ou por funções extras, porque o princípio do rolê barato diz que dinheiro não pode virar barreira.
 
 ## Etapas
-1. **Base** (agora): esquema do banco com regras de acesso, login, app novo ligado no Supabase, migração dos dados, tela de aprovação pro admin, publicação no GitHub Pages.
+1. **Base** (feita em 26/11/2026, no ar em https://brederf.github.io/resenha/): esquema do banco com regras de acesso, login, app novo ligado no Supabase, migração dos dados, tela de aprovação pro admin, publicação no GitHub Pages.
 2. **Robô na nuvem**: busca diária de eventos rodando no GitHub Actions, gravando direto no Supabase. Instagram e TikTok continuam pelo Chrome do Mac às sextas.
 3. **IA por API**: ler print e montar roteiro, com a chave escondida numa função do Supabase. Conferir se a API escolhida lê imagem.
 4. **Aberto ao público**: termos de uso, política de privacidade (LGPD) e, se for o caso, cobrança (Pix via Mercado Pago ou Stripe).
@@ -28,7 +28,8 @@ A versão pessoal continua no ar enquanto a nova não fica pronta:
 ## Onde está cada coisa
 - `index.html` + `src/main.js`: o app novo (Vite). A interface veio do app antigo; a parte de dados e o login usam o Supabase.
 - `public/`: ícones e manifesto pra instalar no celular.
-- `.github/workflows/publicar.yml`: publica no GitHub Pages a cada push na branch main. As chaves públicas do Supabase estão em `.env.production`.
+- Publicação: o GitHub Pages serve a branch `gh-pages`, que é só a pasta `dist` gerada. Pra publicar: `npm run publicar` (gera o build e manda pra gh-pages). As chaves públicas do Supabase estão em `.env.production`.
+- `.github/workflows/publicar.yml` existe só no computador: o login do GitHub CLI não tem a permissão `workflow`. Quando tiver (`gh auth refresh -h github.com -s workflow`), dá pra commitar e trocar a fonte do Pages pra GitHub Actions.
 - `npm run dev` roda local; `npm run build` gera a pasta dist; o primeiro usuário que entra vira admin.
 - `referencia/app-antigo.html`: o app antigo, como referência.
 - `supabase/001_esquema.sql`: tabelas e regras de acesso. Rodar no SQL Editor do Supabase.

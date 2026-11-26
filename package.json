@@ -1,16 +1,17 @@
 {
- "name": "resenha",
- "private": true,
- "type": "module",
- "scripts": {
-  "dev": "vite",
-  "build": "vite build",
-  "preview": "vite preview"
- },
- "dependencies": {
-  "@supabase/supabase-js": "^2.45.0"
- },
- "devDependencies": {
-  "vite": "^5.4.0"
- }
+  "name": "resenha",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "publicar": "vite build && cd dist && touch .nojekyll && git init -q -b gh-pages && git add -A && git commit -qm publicar && git push -f https://github.com/brederf/resenha.git gh-pages && rm -rf .git"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0"
+  }
 }
