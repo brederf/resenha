@@ -22,7 +22,7 @@ A versão pessoal continua no ar enquanto a nova não fica pronta:
 ## Etapas
 1. **Base** (feita em 26/11/2026, no ar em https://brederf.github.io/resenha/): esquema do banco com regras de acesso, login, app novo ligado no Supabase, migração dos dados, tela de aprovação pro admin, publicação no GitHub Pages.
 2. **Robô na nuvem**: busca diária de eventos rodando no GitHub Actions, gravando direto no Supabase. Instagram e TikTok continuam pelo Chrome do Mac às sextas.
-3. **IA por API** (montada em 26/11/2026): DeepSeek, modelo `deepseek-flash`, que lê imagem. O app chama a função `ia` do Supabase (`supabase/functions/ia`), que confere o login, conta o uso (`supabase/002_ia.sql`: 20 por dia, admin 200) e chama o DeepSeek com a chave guardada no segredo `DEEPSEEK_API_KEY`. A função foi publicada pelo editor do painel do Supabase, com "Verify JWT with legacy secret" desligado (a própria função confere o login).
+3. **IA por API** (montada em 26/11/2026): DeepSeek, modelo `deepseek-flash`, que lê imagem. O app chama a função `ia` do Supabase (`supabase/functions/ia`), que confere o login, conta o uso (`supabase/002_ia.sql`: 20 por dia, admin 200) e chama o DeepSeek com a chave guardada no segredo `DEEPSEEK` (também aceita `DEEPSEEK_API_KEY`). A função foi publicada pelo editor do painel do Supabase, com "Verify JWT with legacy secret" desligado (a própria função confere o login).
 4. **Aberto ao público**: termos de uso, política de privacidade (LGPD) e, se for o caso, cobrança (Pix via Mercado Pago ou Stripe).
 
 ## Onde está cada coisa

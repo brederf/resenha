@@ -36,7 +36,7 @@ Deno.serve(async (req) => {
     && body.imagem.length < 8_000_000 ? body.imagem : null;
   if (!prompt) return resp({ code: 'bad_request' }, 400);
 
-  const chave = Deno.env.get('DEEPSEEK_API_KEY');
+  const chave = Deno.env.get('DEEPSEEK_API_KEY') || Deno.env.get('DEEPSEEK');
   if (!chave) return resp({ code: 'sem_chave' }, 500);
 
   const { data: uso, error } = await sb.rpc('consumir_ia');
