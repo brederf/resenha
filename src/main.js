@@ -672,8 +672,8 @@ function md(t){
 function vLogin(){
   const l = S.login || {};
   const email = l.etapa === 'codigo'
-    ? `<div class="form"><p class="mut">Mandamos um código pra ${esc(l.email)}. Confere a caixa de entrada e o spam.</p><div class="f"><label for="loginCodigo">Código</label><input type="text" id="loginCodigo" inputmode="numeric" autocomplete="one-time-code"></div><button class="btn btn-p" data-act="login-codigo">Entrar</button><button class="btn" data-act="login-voltar">Usar outro e-mail</button></div>`
-    : `<details class="login-email"><summary>Prefiro entrar com código por e-mail</summary><div class="form"><div class="f"><label for="loginEmail">E-mail</label><input type="text" id="loginEmail" inputmode="email" autocomplete="email" value="${esc(l.email || '')}"></div><button class="btn" data-act="login-email">Mandar código</button></div></details>`;
+    ? `<div class="aviso cob">Mandamos um link de entrada pra <strong>${esc(l.email)}</strong>. Abre o e-mail neste mesmo aparelho e toca em "Sign in". Confere o spam se não chegar.<div class="acts"><button class="btn btn-s" data-act="login-voltar">Usar outro e-mail</button></div></div>`
+    : `<details class="login-email"><summary>Prefiro entrar com link por e-mail</summary><div class="form"><div class="f"><label for="loginEmail">E-mail</label><input type="text" id="loginEmail" inputmode="email" autocomplete="email" value="${esc(l.email || '')}"></div><button class="btn" data-act="login-email">Mandar link</button></div></details>`;
   return `<section class="login"><h2 class="h2">Entra na Resenha</h2><p class="mut">Seus rolês, a agenda de BH e o que a galera sugere, num lugar só.</p>
     <button class="btn btn-p btn-big" data-act="login-google">Entrar com Google</button>${email}${l.erro ? `<p class="erro">${esc(l.erro)}</p>` : ''}</section>`;
 }
@@ -1116,7 +1116,7 @@ document.addEventListener('click', async ev => {
       if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ S.login = {email, erro: 'Confere o e-mail.'}; render(); break; }
       el.disabled = true;
       const {error} = await sb.auth.signInWithOtp({email, options: {emailRedirectTo: location.origin + location.pathname}});
-      S.login = error ? {email, erro: 'Não deu pra mandar o código. Espera um minuto e tenta de novo.'} : {email, etapa: 'codigo'};
+      S.login = error ? {email, erro: 'Não deu pra mandar o link. Espera um minuto e tenta de novo.'} : {email, etapa: 'codigo'};
       render(); break;
     }
     case 'login-codigo': {

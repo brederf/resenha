@@ -13,7 +13,7 @@ A versão pessoal continua no ar enquanto a nova não fica pronta:
 ## Decisões já tomadas
 - Três camadas: **pública** (eventos e lugares aprovados), **pessoal** (lista, fila, diário, caderno, ideias privadas) e **grupo** (fica pra depois).
 - Qualquer pessoa pode sugerir evento ou lugar; o admin (o dono) aprova antes de aparecer pra todo mundo.
-- Login com Google, e código por e-mail como opção secundária. Sem senha.
+- Login com Google, e link por e-mail como opção secundária (o plano grátis do Supabase não deixa mudar o e-mail pra mandar código). Sem senha.
 - Site instalável na tela do celular (PWA). Sem App Store por enquanto.
 - Banco: Supabase. Hospedagem: GitHub Pages. Código num repositório do GitHub.
 - Funções em grupo (fila da galera, "eu vou", rodízio da resenha): por enquanto não. Combinar no WhatsApp.
