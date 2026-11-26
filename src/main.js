@@ -189,13 +189,41 @@ async function carregar(){
   S.status = 'ok';
 }
 
+// IA: o app manda o pedido pra função "ia" do Supabase, que chama o DeepSeek com a chave guardada lá.
+function imagemParaDataURL(blob){
+  return new Promise((ok, falhou) => {
+    const url = URL.createObjectURL(blob), img = new Image();
+    img.onload = () => {
+      const max = 1600, k = Math.min(1, max / Math.max(img.width, img.height));
+      const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url);
+      ok(c.toDataURL('image/jpeg', 0.85));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); falhou({code:'image_rejected'}); };
+    img.src = url;
+  });
+}
+const IA = {
+  async json(prompt, opts){
+    const body = {prompt};
+    if (opts && opts.images && opts.images[0]) body.imagem = await imagemParaDataURL(opts.images[0]);
+    const {data, error} = await sb.functions.invoke('ia', {body});
+    if (error){
+      let info = null; try { info = await error.context.json(); } catch (_){}
+      throw Object.assign({code: (info && info.code) || 'erro'}, info || {});
+    }
+    if (!data || !data.ok) throw {code: (data && data.code) || 'erro'};
+    return data.resultado;
+  },
+};
+
 async function iniciar(){
   render();
   if (!sb){ S.status = 'erro'; S.erroMsg = 'O app está sem a configuração do Supabase.'; render(); return; }
   sb.auth.onAuthStateChange((evento, sessao) => {
     const u = sessao && sessao.user;
-    if (u && (!S.user || S.user.id !== u.id)){ S.user = u; S.db = sb; S.status = 'carregando'; render(); recarregar(); }
-    if (!u && S.user){ S.user = null; S.db = null; S.status = 'login'; render(); }
+    if (u && (!S.user || S.user.id !== u.id)){ S.user = u; S.db = sb; S.sample = IA; S.sampleImg = true; S.status = 'carregando'; render(); recarregar(); }
+    if (!u && S.user){ S.user = null; S.db = null; S.sample = null; S.status = 'login'; render(); }
   });
   const {data} = await sb.auth.getSession();
   if (!data.session){ S.status = 'login'; render(); }
@@ -489,7 +517,7 @@ function promptRoteiro(pool){
     horario: p.kind === 'evento' ? (x.horario || '') : (x.horario || []).map(k => HOR[k]).join('/'), duracao: DUR[x.duracao] || '', nota: String(x.obs || x.descricao || '').slice(0, 140)}; });
   return 'Você monta roteiros de rolê em Belo Horizonte para uma pessoa que anda de Uber e de ônibus em BH (domingo o ônibus é de graça).\n' +
     'Pedido: rolê ' + quando + ', ' + COM[b.com].toLowerCase() + ', tempo disponível: ' + DUR[b.tempo] + ', grana: ' + (b.grana === 'gratis' ? 'só coisa grátis' : b.grana === 'pouca' ? 'gastar pouco' : 'tanto faz') + (b.chuva ? ', está chovendo' : '') + '.\n' +
-    'Princípios dele: rolê barato como padrão, uma âncora por encontro, juntar paradas que fiquem perto uma da outra.\n' +
+    'Princípios do app: rolê barato como padrão, uma âncora por encontro, juntar paradas que fiquem perto uma da outra.\n' +
     'Opções disponíveis (JSON):\n' + JSON.stringify(lista) + '\n' +
     'Monte 2 roteiros diferentes, cada um com 2 ou 3 paradas que façam sentido juntas (mesma região ou no caminho, horários compatíveis). Use só opções da lista, citando o id. Pode incluir uma parada genérica como "comer algo por perto" com id null.\n' +
     'Responda só com JSON neste formato:\n{"roteiros":[{"titulo":"","resumo":"uma frase","paradas":[{"quando":"","id":"id ou null","oque":""}],"custo":"","dica":""}]}\n' +
@@ -514,7 +542,9 @@ function msgIA(e){
   if (c === 'rate_limited') return 'Muitos pedidos agora. Tenta de novo daqui a pouco.';
   if (c === 'image_rejected') return 'Esse arquivo não deu. Tenta outro print.';
   if (c === 'invalid_json' || c === 'empty_completion') return 'Não consegui organizar. Tenta de novo ou preenche na mão.';
-  if (c === 'session_expired') return 'Sua sessão do Claude expirou. Entra de novo e tenta.';
+  if (c === 'session_expired') return 'Sua sessão expirou. Sai, entra de novo e tenta.';
+  if (c === 'limite') return 'Você usou as ' + (e.limite || '') + ' leituras de IA de hoje. Amanhã libera de novo. Dá pra preencher na mão.';
+  if (c === 'sem_chave' || c === 'sem_saldo') return 'A IA está fora do ar agora. Dá pra preencher na mão.';
   if (c === 'cancelled') return 'Cancelado.';
   return 'Deu erro na IA. Tenta de novo.';
 }
@@ -981,7 +1011,7 @@ async function salvarForm(){
 }
 function promptExtrair(texto){
   const h = hojeISO(), d = fromISO(h);
-  return 'Você organiza divulgações de eventos e rolês em Belo Horizonte (MG) para um app pessoal.\n' +
+  return 'Você organiza divulgações de eventos e rolês em Belo Horizonte (MG) para um app de rolês.\n' +
     'Hoje é ' + DOW_L[d.getDay()] + ', ' + h + '. Quando o ano não aparecer, use a próxima data futura.\n' +
     (texto ? 'Texto colado pelo usuário:\n"""\n' + texto.slice(0, 8000) + '\n"""\n' : 'Leia o print anexado (pode ser post de Instagram, TikTok, cartaz ou site).\n') +
     'Responda só com um objeto JSON neste formato:\n' +
